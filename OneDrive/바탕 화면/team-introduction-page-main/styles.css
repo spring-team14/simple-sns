@@ -1,0 +1,52 @@
+body {
+    font-family: Arial, sans-serif;
+    background-image: url('c:\Users\tprpw\Downloads\1735269083887.jpg'); /* 배경 이미지*/
+    background-size: cover; /* 화면에 맞춰 이미지 크기 자동 조정*/
+    background-position: center center; /* 이미지 중앙에 맞추기*/
+    background-attachment: fixed; /* 스크롤 시 배경 이미지가 고정되도록*/
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* 화면 전체를 채우도록 설정*/
+  }
+  
+  h1 {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .team-member-info {
+    margin: 20px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .team-member-info p {
+    font-size: 18px;
+  }
+  
+  input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #007bff;
+    color: white;
+  }
+  
