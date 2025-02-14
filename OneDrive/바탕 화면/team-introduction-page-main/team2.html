@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>팀원 2 소개</title>
+  <link rel="stylesheet" href="styles.css"> <!-- styles.css 파일 연결 -->
+</head>
+<body>
+  <h1>팀원 2</h1>
+  <div class="team-member-info">
+    <!-- 수정 가능한 입력 필드 -->
+    <p><strong>이름:</strong> <input type="text" id="name" value="팀원 2"></p>
+    <p><strong>소개:</strong> <input type="text" id="position" value="개발자"></p>
+    <p><strong>역할:</strong> <input type="email" id="email" value="team1@example.com"></p>
+    <p><strong>목표:</strong></p>
+    <textarea id="intro" rows="4" cols="50">팀원 2은 백엔드 개발을 담당하고 있습니다. 다양한 기술 스택을 사용하여 시스템을 최적화하고 있습니다.</textarea>
+  </div>
+  
+  <button onclick="window.location.href='file:///C:/Users/tprpw/OneDrive/%EB%B0%94%ED%83%95%20%ED%99%94%EB%A9%B4/team-introduction-page-main/create_member.html'">메인 페이지로 돌아가기</button>
+  <button onclick="saveInfo()">정보 저장</button>
+  
+  <script>
+    // 정보 저장 함수
+    function saveInfo() {
+      const name = document.getElementById("name").value;
+      const position = document.getElementById("position").value;
+      const email = document.getElementById("email").value;
+      const intro = document.getElementById("intro").value;
+
+      // 여기에서 정보를 저장할 수 있습니다.
+      // 예를 들어, 로컬 스토리지에 저장하거나 서버로 전송하는 방식으로 처리 가능
+      alert("정보가 저장되었습니다!\n" +
+            "이름: " + name + "\n" +
+            "소개: " + position + "\n" +
+            "역할: " + email + "\n" +
+            "목표: " + intro);
+    }
+  </script>
+</body>
+</html>
