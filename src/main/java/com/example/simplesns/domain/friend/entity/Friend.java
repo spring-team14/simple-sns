@@ -1,13 +1,24 @@
 package com.example.simplesns.domain.friend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.example.simplesns.common.BaseEntity;
+import com.example.simplesns.domain.user.entity.User;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 @Getter
 @Entity
-public class Friend {
+@Table(name = "friend")
+public class Friend extends BaseEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "friend_id")
+    private User friend;
 
 }
