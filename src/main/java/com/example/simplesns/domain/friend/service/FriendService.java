@@ -95,6 +95,11 @@ public class FriendService {
         Friend pair = friendRepository.findByUserId(friend.getFriend().getId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "친구 정보를 찾을 수 없습니다."));
         friendRepository.delete(pair);
+
+        // 기존 요청 이력 확인
+        FriendRequest findFriendRequest = friendRequestRepository.findByFromIdAndToId(friend.getUser().getId()
+                , friend.getFriend().getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        friendRequestRepository.delete(findFriendRequest);
     }
 
     private User findUser(Long userId) {
