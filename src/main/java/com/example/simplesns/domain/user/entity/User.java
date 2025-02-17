@@ -31,6 +31,7 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String password;
+    private String username;
 
     public User(String email, String name, LocalDate birthdate, String image, String mbti, String password) {
         this.email = email;
@@ -53,5 +54,9 @@ public class User extends BaseEntity {
         this.birthdate = birthdate;
         this.image = image;
         this.mbti = mbti;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }
