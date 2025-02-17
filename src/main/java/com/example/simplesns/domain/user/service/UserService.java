@@ -1,5 +1,7 @@
 package com.example.simplesns.domain.user.service;
 
+import com.example.simplesns.common.config.PasswordEncoder;
+import com.example.simplesns.domain.user.dto.request.LoginRequestDto;
 import com.example.simplesns.domain.user.dto.request.UserDeleteRequestDto;
 import com.example.simplesns.domain.user.dto.request.UserProfileRequestDto;
 import com.example.simplesns.domain.user.dto.request.UserSaveRequestDto;
@@ -21,6 +23,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 유저 생성(회원가입)
     @Transactional
@@ -29,7 +32,8 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 이메일은 이미 사용중입니다.");
         }
 
-        User user = new User(dto.getEmail(), dto.getName(), dto.getBirthdate(), dto.getPassword());
+        String encodedPassword = passwordEncoder.encode(dto.getPassword());
+        User user = new User(dto.getEmail(), dto.getName(), dto.getBirthdate(), encodedPassword);
         userRepository.save(user);
 
         return new UserResponseDto(
@@ -83,7 +87,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다."));
 
-        if (!dto.getPassword().equals(user.getPassword())) {
+        if (isPasswordNotMatched(dto.getPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
         }
 
@@ -91,8 +95,8 @@ public class UserService {
                 dto.getName(),
                 dto.getBirthdate(),
                 dto.getImage(),
-                dto.getMbti(),
-                dto.getPassword());
+                dto.getMbti()
+        );
 
         return new UserProfileResponseDto(
                 user.getId(),
@@ -113,10 +117,26 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이메일이 일치하지 않습니다.");
         }
 
-        if (!dto.getPassword().equals(user.getPassword())) {
+        if (isPasswordNotMatched(dto.getPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
         }
 
         userRepository.deleteById(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public Long handleLogin(LoginRequestDto dto) {
+        User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 이메일이 존재하지 않습니다."));
+
+        if (isPasswordNotMatched(dto.getPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+        }
+
+        return user.getId();
+    }
+
+    private boolean isPasswordNotMatched(String inputPassword, String encodedPassword) {
+        return !passwordEncoder.matches(inputPassword, encodedPassword);
     }
 }

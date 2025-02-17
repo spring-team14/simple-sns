@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.PatternMatchUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Slf4j
 public class LoginFilter implements Filter {
 
-    private static final String[] WHITE_LIST = {"/", "/api/members/sign-up", "/api/auth/login", "/api/auth/logout"};
+    private static final String[] WHITE_LIST = {"/", "/users/signup", "/login", "/logout"};
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
