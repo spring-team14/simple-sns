@@ -5,6 +5,6 @@ import lombok.Getter;
 @Getter
 public class SignOffFriendRequestDto {
 
-    private Long fromId;
+    private Long toId;
     private Integer status;
 }

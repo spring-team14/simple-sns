@@ -1,4 +1,4 @@
-package com.example.simplesns.domain.friend.dto.common;
+package com.example.simplesns.common.dto;
 
 import lombok.Getter;
 import org.springframework.data.domain.Page;
