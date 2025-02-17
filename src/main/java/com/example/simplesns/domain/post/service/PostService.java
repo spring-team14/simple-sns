@@ -4,59 +4,110 @@ import com.example.simplesns.domain.post.dto.PostRequestDto;
 import com.example.simplesns.domain.post.dto.PostResponseDto;
 import com.example.simplesns.domain.post.entity.Post;
 import com.example.simplesns.domain.post.repository.PostRepository;
+import com.example.simplesns.domain.user.entity.User;
+import com.example.simplesns.domain.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
-    // 게시물 작성
-    public PostResponseDto createPost(PostRequestDto postRequestDto) {
-        Post post = new Post(postRequestDto.getTitle(), postRequestDto.getContent(), postRequestDto.getAuthor());
+    // 게시글 생성
+    @Transactional
+    public PostResponseDto save(PostRequestDto dto) {
+        // user 존재 여부 확인
+        User user = userRepository.findById(dto.getUserId()).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 user입니다")
+        );
+
+        // Post 객체 생성
+        Post post = new Post(dto.getTitle(), dto.getContent(), user);
         Post savedPost = postRepository.save(post);
-        return new PostResponseDto(savedPost.getId(), savedPost.getTitle(), savedPost.getContent(), savedPost.getAuthor(), savedPost.getCreatedDate());
+
+        // 생성된 Post의 ID, title, content, createdAt, updatedAt을 포함한 ResponseDto 반환
+        return new PostResponseDto(
+                savedPost.getId(),
+                savedPost.getTitle(),
+                savedPost.getContent(),
+                savedPost.getCreatedAt(),
+                savedPost.getUpdatedAt()
+        );
     }
 
-    // 게시물 조회
-    public PostResponseDto getPost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor(), post.getCreatedDate());
-    }
+    // 모든 게시글 조회
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<PostResponseDto> findAll() {
+        List<Post> posts = postRepository.findAll();
 
-    // 게시물 수정
-    public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, String currentUser) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-
-        // 작성자가 아닌 경우 예외 처리
-        if (!post.getAuthor().equals(currentUser)) {
-            throw new RuntimeException("작성자가 아닙니다.");
+        List<PostResponseDto> dtos = new ArrayList<>();
+        for (Post post : posts) {
+            // Post의 각 정보를 포함한 ResponseDto 생성
+            PostResponseDto dto = new PostResponseDto(
+                    post.getId(),
+                    post.getTitle(),
+                    post.getContent(),
+                    post.getCreatedAt(),
+                    post.getUpdatedAt()
+            );
+            dtos.add(dto);
         }
 
-        post.setTitle(postRequestDto.getTitle());
-        post.setContent(postRequestDto.getContent());
-        Post updatedPost = postRepository.save(post);
-
-        return new PostResponseDto(updatedPost.getId(), updatedPost.getTitle(), updatedPost.getContent(), updatedPost.getAuthor(), updatedPost.getCreatedDate());
+        return dtos;
     }
 
-    // 게시물 삭제
-    public void deletePost(Long id, String currentUser) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+    // ID로 게시글 조회
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public PostResponseDto findById(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("그 id 게시글 없음")
+        );
 
-        // 작성자가 아닌 경우 예외 처리
-        if (!post.getAuthor().equals(currentUser)) {
-            throw new RuntimeException("작성자가 아닙니다");
+        // 조회된 Post의 정보를 포함한 ResponseDto 반환
+        return new PostResponseDto(
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getCreatedAt(),
+                post.getUpdatedAt()
+        );
+    }
+
+    // 게시글 수정
+    @Transactional
+    public PostResponseDto update(Long id, PostRequestDto dto) {
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("그 id 게시글 없음")
+        );
+
+        // Post의 내용 수정
+        post.update(dto.getTitle(), dto.getContent()); // 영속성 컨텍스트 관리
+        postRepository.save(post); // 변경된 내용 저장
+
+        // 수정된 Post의 정보를 포함한 ResponseDto 반환
+        return new PostResponseDto(
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getCreatedAt(),
+                post.getUpdatedAt()
+        );
+    }
+
+    // 게시글 삭제
+    @org.springframework.transaction.annotation.Transactional
+    public void deleteById(Long id) {
+        if (!postRepository.existsById(id)) {
+            throw new IllegalArgumentException("그 id가진 게시글이 없어서 삭제 못함");
         }
 
-        postRepository.delete(post);
+        postRepository.deleteById(id);
     }
 }
