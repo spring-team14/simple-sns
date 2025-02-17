@@ -12,8 +12,8 @@ import org.hibernate.annotations.SQLDelete;
 @Entity
 @NoArgsConstructor
 @Table(name = "post")
-@SQLDelete(sql = "UPDATE reply post SET deleted_at = now() WHERE id = ?")
-public class Post extends com.example.simplesns.common.entity.BaseEntity {
+@SQLDelete(sql = "UPDATE post SET deleted_at = now() WHERE id = ?")
+public class Post extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
