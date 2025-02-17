@@ -1,6 +1,6 @@
 package com.example.simplesns.domain.friend.entity;
 
-import com.example.simplesns.common.BaseEntity;
+import com.example.simplesns.common.entity.BaseEntity;
 import com.example.simplesns.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
