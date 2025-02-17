@@ -1,7 +1,10 @@
 package com.example.simplesns.domain.friend.controller;
 
-import com.example.simplesns.domain.friend.dto.common.PaginationResponse;
-import com.example.simplesns.domain.friend.dto.request.*;
+import com.example.simplesns.common.dto.PaginationResponse;
+import com.example.simplesns.domain.friend.dto.request.FriendRequestDto;
+import com.example.simplesns.domain.friend.dto.request.ReqFriendRequestDto;
+import com.example.simplesns.domain.friend.dto.request.SignOffFriendRequestDto;
+import com.example.simplesns.domain.friend.dto.request.createFriendReqRequestDto;
 import com.example.simplesns.domain.friend.dto.response.FriendResponseDto;
 import com.example.simplesns.domain.friend.dto.response.ReqFriendResponseDto;
 import com.example.simplesns.domain.friend.dto.response.createFriendReqResponseDto;
@@ -18,36 +21,41 @@ public class FriendController {
     private final FriendService friendService;
 
     // 친구 등록
-    @PostMapping
+    @PostMapping("/request")
     public ResponseEntity<createFriendReqResponseDto> createFriendReq(@RequestBody createFriendReqRequestDto dto) {
         return ResponseEntity.ok(friendService.createFriendReq(dto));
     }
 
-    // 친구 목록 조회
-    @GetMapping
-    public ResponseEntity<PaginationResponse<FriendResponseDto>> findAll(@RequestBody FriendRequestDto dto) {
-        return ResponseEntity.ok(friendService.findAll(dto));
-    }
-
     // 친구 요청 목록 조회
     @GetMapping("/request")
-    public ResponseEntity<PaginationResponse<ReqFriendResponseDto>> findAllRequest(@RequestBody ReqFriendRequestDto dto) {
-        return ResponseEntity.ok(friendService.findAllRequest(dto));
+    public ResponseEntity<PaginationResponse<ReqFriendResponseDto>> findAllRequest(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestBody ReqFriendRequestDto dto) {
+        return ResponseEntity.ok(friendService.findAllRequest(page, size, dto));
     }
 
     // 친구 요청 수락
-    @PatchMapping("/request/{toId}")
-    public ResponseEntity<Void> signOffFriend(@PathVariable Long toId,
+    @PatchMapping("/request/{id}")
+    public ResponseEntity<Void> signOffFriend(@PathVariable Long id,
                                               @RequestBody SignOffFriendRequestDto dto) {
-        friendService.signOffFriend(toId, dto);
+        friendService.signOffFriend(id, dto);
         return ResponseEntity.ok().build();
     }
 
+    // 친구 목록 조회
+    @GetMapping
+    public ResponseEntity<PaginationResponse<FriendResponseDto>> findAll(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestBody FriendRequestDto dto) {
+        return ResponseEntity.ok(friendService.findAll(page, size, dto));
+    }
+
     // 친구 삭제
-    @DeleteMapping("/{friendId}")
-    public ResponseEntity<Void> deleteFriend(@PathVariable Long friendId,
-                                             @RequestBody DeleteFriendRequestDto dto) {
-        friendService.deleteFriend(friendId, dto);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFriend(@PathVariable Long id) {
+        friendService.deleteFriend(id);
         return ResponseEntity.ok().build();
     }
 

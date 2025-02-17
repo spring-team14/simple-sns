@@ -31,4 +31,8 @@ public class FriendRequest extends BaseEntity {
         this.to = to;
         this.status = status;
     }
+
+    public void updateStatus(FriendStatus status) {
+        this.status = status;
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.simplesns.domain.friend.dto.response;
 
+import com.example.simplesns.domain.friend.entity.FriendRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
@@ -25,5 +26,17 @@ public class createFriendReqResponseDto {
         this.toName = toName;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public static createFriendReqResponseDto of(FriendRequest friendRequest) {
+        return new createFriendReqResponseDto(
+                friendRequest.getId(),
+                friendRequest.getFrom().getId(),
+                friendRequest.getFrom().getName(),
+                friendRequest.getTo().getId(),
+                friendRequest.getTo().getName(),
+                friendRequest.getCreatedAt(),
+                friendRequest.getUpdatedAt()
+        );
     }
 }
