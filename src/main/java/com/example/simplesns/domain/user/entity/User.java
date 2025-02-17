@@ -1,6 +1,6 @@
 package com.example.simplesns.domain.user.entity;
 
-import com.example.simplesns.common.BaseEntity;
+import com.example.simplesns.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.simplesns.common;
+package com.example.simplesns.common.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

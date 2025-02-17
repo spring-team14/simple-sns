@@ -1,6 +1,6 @@
-package com.example.simplesns.config;
+package com.example.simplesns.common.config;
 
-import com.example.simplesns.filter.LoginFilter;
+import com.example.simplesns.common.filter.LoginFilter;
 import jakarta.servlet.Filter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
