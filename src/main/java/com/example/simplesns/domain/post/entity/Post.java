@@ -6,10 +6,13 @@ import com.example.simplesns.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 @Getter
 @Entity
 @NoArgsConstructor
+@Table(name = "post")
+@SQLDelete(sql = "UPDATE reply post SET deleted_at = now() WHERE id = ?")
 public class Post extends com.example.simplesns.common.entity.BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
