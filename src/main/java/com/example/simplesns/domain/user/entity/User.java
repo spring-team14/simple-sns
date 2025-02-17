@@ -40,4 +40,19 @@ public class User extends BaseEntity {
         this.mbti = mbti;
         this.password = password;
     }
+
+    public User(String email, String name, LocalDate birthdate, String password) {
+        this.email = email;
+        this.name = name;
+        this.birthdate = birthdate;
+        this.password = password;
+    }
+
+    public void updateProfile(String name, LocalDate birthdate, String image, String mbti, String password) {
+        this.name = name;
+        this.birthdate = birthdate;
+        this.image = image;
+        this.mbti = mbti;
+        this.password = password;
+    }
 }
