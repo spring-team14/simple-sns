@@ -1,11 +1,10 @@
 package com.example.simplesns.domain.comment.dto;
 
-import com.example.simplesns.domain.comment.entity.Comment;
+import java.time.LocalDateTime;  // 추가된 import
+import java.util.List;  // 추가된 import
+import java.util.stream.Collectors;  // 추가된 import
+import com.example.simplesns.domain.comment.entity.Comment;  // 추가된 import
 import lombok.Getter;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public class CommentResponseDto {
@@ -20,11 +19,13 @@ public class CommentResponseDto {
         this.id = comment.getId();
         this.content = comment.getContent();
         this.imageUrl = comment.getImageUrl();
-        this.userName = comment.getUser().getName();
+        this.userName = (comment.getUser() != null) ? comment.getUser().getName() : "Anonymous"; // 수정된 부분
         this.createdAt = comment.getCreatedAt();
-        this.replies = comment.getReplies().stream()
+        this.replies = comment.getReplies() != null
+                ? comment.getReplies().stream()
                 .map(CommentResponseDto::new)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : List.of(); // replies가 null이면 빈 리스트 반환
     }
 }
 
