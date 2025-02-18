@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "user")
+@Table(name = "users")
 public class User extends BaseEntity {
 
     @Id
@@ -30,6 +30,7 @@ public class User extends BaseEntity {
     private String mbti;
 
     @Column(nullable = false)
+
     private String password;
 
     public User(String email, String name, LocalDate birthdate, String image, String mbti, String password) {

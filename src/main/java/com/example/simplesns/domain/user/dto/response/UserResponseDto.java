@@ -1,5 +1,6 @@
 package com.example.simplesns.domain.user.dto.response;
 
+import com.example.simplesns.domain.user.entity.User;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -23,4 +24,16 @@ public class UserResponseDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public UserResponseDto(User user) {
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.name = user.getName();
+        this.birthdate = user.getBirthdate();
+        this.createdAt = user.getCreatedAt();
+        this.updatedAt = user.getUpdatedAt();
+
+    }
+
+
 }
