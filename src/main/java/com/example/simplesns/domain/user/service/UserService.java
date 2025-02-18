@@ -1,10 +1,7 @@
 package com.example.simplesns.domain.user.service;
 
 import com.example.simplesns.common.config.PasswordEncoder;
-import com.example.simplesns.domain.user.dto.request.LoginRequestDto;
-import com.example.simplesns.domain.user.dto.request.UserDeleteRequestDto;
-import com.example.simplesns.domain.user.dto.request.UserProfileRequestDto;
-import com.example.simplesns.domain.user.dto.request.UserSaveRequestDto;
+import com.example.simplesns.domain.user.dto.request.*;
 import com.example.simplesns.domain.user.dto.response.UserProfileResponseDto;
 import com.example.simplesns.domain.user.dto.response.UserResponseDto;
 import com.example.simplesns.domain.user.entity.User;
@@ -105,6 +102,24 @@ public class UserService {
                 user.getBirthdate(),
                 user.getImage(),
                 user.getMbti());
+    }
+
+    // 특정 유저 비밀번호 수정
+    @Transactional
+    public void updatePassword(Long userId, UserPasswordUpdateRequestDto dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다."));
+
+        if (isPasswordNotMatched(dto.getCurrentPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "기존 비밀번호가 일치하지 않습니다.");
+        }
+
+        if (!isPasswordNotMatched(dto.getNewPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "새 비밀번호는 기존 비밀번호와 다르게 설정해야 합니다.");
+        }
+
+        String encodedPassword = passwordEncoder.encode(dto.getNewPassword());
+        user.updatePassword(encodedPassword);
     }
 
     // 유저 삭제(회원탈퇴. 이메일&비밀번호 확인 필요)

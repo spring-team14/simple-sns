@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "users")
+@Table(name = "user")
 public class User extends BaseEntity {
 
     @Id
@@ -53,6 +53,10 @@ public class User extends BaseEntity {
         this.birthdate = birthdate;
         this.image = image;
         this.mbti = mbti;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 
 }
