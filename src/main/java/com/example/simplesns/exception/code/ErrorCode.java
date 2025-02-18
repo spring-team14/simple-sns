@@ -21,6 +21,8 @@ public enum ErrorCode {
 
     FRIEND_NOT_FOUND(HttpStatus.NOT_FOUND, "친구 정보를 찾을 수 없습니다."),
 
+    FRIEND_STATUS_NOT_WAIT(HttpStatus.BAD_REQUEST, "대기 상태의 요청만 처리할 수 있습니다."),
+
     UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
 
     UNAUTHORIZED(HttpStatus.FORBIDDEN, "이 작업을 수행할 권한이 없습니다."),

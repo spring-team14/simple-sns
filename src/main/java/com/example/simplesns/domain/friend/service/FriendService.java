@@ -20,6 +20,7 @@ import com.example.simplesns.exception.custom.UserNotFoundException;
 import com.example.simplesns.exception.custom.friend.FriendNotFoundException;
 import com.example.simplesns.exception.custom.friend.FriendRequestAlreadyExistException;
 import com.example.simplesns.exception.custom.friend.FriendRequestNotFoundException;
+import com.example.simplesns.exception.custom.friend.FriendStatusNotWaitException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -62,7 +63,7 @@ public class FriendService {
         List<FriendStatus> statusList = new ArrayList<>();
 
         if (dto.getStatus() == null) {
-            statusList = List.of(FriendStatus.WAIT, FriendStatus.ACCEPT, FriendStatus.REJECT);
+            statusList = List.of(FriendStatus.values());
         } else {
             statusList.add(FriendStatus.of(dto.getStatus()));
         }
@@ -82,6 +83,11 @@ public class FriendService {
         // 피요청자 == 로그인 유저 검증
         if (!findFriendRequest.getTo().getId().equals(userId)) {
             throw new UnauthorizedException();
+        }
+
+        // 대기 상태의 요청만 처리 가능
+        if (!FriendStatus.WAIT.equals(findFriendRequest.getStatus())) {
+            throw new FriendStatusNotWaitException();
         }
 
         // 사용자가 거절한 경우
@@ -133,7 +139,7 @@ public class FriendService {
         PageRequest pageable = createPageable(page, size);
         List<Long> friendIds = friendRepository.findFriendIdsByUserId(userId, dto.getFriendId());
         Page<Post> friendsPostsPage = friendPostRepository.findAllByUserId(pageable, friendIds, dto.getFromAt(), dto.getToAt().plusDays(1));
-        // TODO 댓글 수 추가
+        // TODO 댓글 수, 좋아요 수 추가
         return new PaginationResponse<>(friendsPostsPage.map(FriendsPostResponseDto::new));
     }
 
