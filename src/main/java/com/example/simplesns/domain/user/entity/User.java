@@ -30,6 +30,7 @@ public class User extends BaseEntity {
     private String mbti;
 
     @Column(nullable = false)
+
     private String password;
 
     public User(String email, String name, LocalDate birthdate, String image, String mbti, String password) {
@@ -53,6 +54,10 @@ public class User extends BaseEntity {
         this.birthdate = birthdate;
         this.image = image;
         this.mbti = mbti;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 
 }

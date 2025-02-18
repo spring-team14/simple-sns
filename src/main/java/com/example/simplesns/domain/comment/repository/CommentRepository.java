@@ -11,3 +11,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     // 특정 게시글의 댓글을 가져오는 메서드
     List<Comment> findByPost(Post post);
 }
+

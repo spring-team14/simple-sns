@@ -1,6 +1,8 @@
 package com.example.simplesns.domain.user.controller;
 
+import com.example.simplesns.common.dto.PaginationResponse;
 import com.example.simplesns.domain.user.dto.request.UserDeleteRequestDto;
+import com.example.simplesns.domain.user.dto.request.UserPasswordUpdateRequestDto;
 import com.example.simplesns.domain.user.dto.request.UserProfileRequestDto;
 import com.example.simplesns.domain.user.dto.request.UserSaveRequestDto;
 import com.example.simplesns.domain.user.dto.response.UserProfileResponseDto;
@@ -26,8 +28,10 @@ public class UserController {
 
     // 전체 유저 목록 조회
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponseDto>> findAll() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<PaginationResponse<UserResponseDto>> findAll(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(userService.findAll(page, size));
     }
 
     // 특정 유저 프로필 조회
@@ -43,6 +47,12 @@ public class UserController {
         return ResponseEntity.ok(userService.updateProfile(userId, dto));
     }
 
+    // 특정 유저 비밀번호 수정
+    @PatchMapping("/users/{userId}/password")
+    public void updatePassword(
+            @PathVariable Long userId, @RequestBody UserPasswordUpdateRequestDto dto) {
+       userService.updatePassword(userId, dto);
+    }
 
     // 유저 삭제(회원탈퇴. 이메일&비밀번호 확인 필요)
     @DeleteMapping("/users/{userId}")
