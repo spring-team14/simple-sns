@@ -4,8 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class ReqFriendRequestDto {
-
-    // TODO 인증 구현 후 삭제
-    private Long toId;
     private Integer status;
+    private String email;
+    private String name;
 }

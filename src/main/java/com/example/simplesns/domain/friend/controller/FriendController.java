@@ -1,11 +1,10 @@
 package com.example.simplesns.domain.friend.controller;
 
+import com.example.simplesns.common.consts.Const;
 import com.example.simplesns.common.dto.PaginationResponse;
-import com.example.simplesns.domain.friend.dto.request.FriendRequestDto;
-import com.example.simplesns.domain.friend.dto.request.ReqFriendRequestDto;
-import com.example.simplesns.domain.friend.dto.request.SignOffFriendRequestDto;
-import com.example.simplesns.domain.friend.dto.request.createFriendReqRequestDto;
+import com.example.simplesns.domain.friend.dto.request.*;
 import com.example.simplesns.domain.friend.dto.response.FriendResponseDto;
+import com.example.simplesns.domain.friend.dto.response.FriendsPostResponseDto;
 import com.example.simplesns.domain.friend.dto.response.ReqFriendResponseDto;
 import com.example.simplesns.domain.friend.dto.response.createFriendReqResponseDto;
 import com.example.simplesns.domain.friend.service.FriendService;
@@ -22,8 +21,9 @@ public class FriendController {
 
     // 친구 등록
     @PostMapping("/request")
-    public ResponseEntity<createFriendReqResponseDto> createFriendReq(@RequestBody createFriendReqRequestDto dto) {
-        return ResponseEntity.ok(friendService.createFriendReq(dto));
+    public ResponseEntity<createFriendReqResponseDto> createFriendReq(@SessionAttribute(name = Const.LOGIN_USER) Long userId,
+                                                                      @RequestBody createFriendReqRequestDto dto) {
+        return ResponseEntity.ok(friendService.createFriendReq(userId, dto));
     }
 
     // 친구 요청 목록 조회
@@ -31,15 +31,17 @@ public class FriendController {
     public ResponseEntity<PaginationResponse<ReqFriendResponseDto>> findAllRequest(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
+            @SessionAttribute(name = Const.LOGIN_USER) Long userId,
             @RequestBody ReqFriendRequestDto dto) {
-        return ResponseEntity.ok(friendService.findAllRequest(page, size, dto));
+        return ResponseEntity.ok(friendService.findAllRequest(page, size, userId, dto));
     }
 
     // 친구 요청 수락
     @PatchMapping("/request/{id}")
     public ResponseEntity<Void> signOffFriend(@PathVariable Long id,
+                                              @SessionAttribute(name = Const.LOGIN_USER) Long userId,
                                               @RequestBody SignOffFriendRequestDto dto) {
-        friendService.signOffFriend(id, dto);
+        friendService.signOffFriend(id, userId, dto);
         return ResponseEntity.ok().build();
     }
 
@@ -48,16 +50,24 @@ public class FriendController {
     public ResponseEntity<PaginationResponse<FriendResponseDto>> findAll(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
+            @SessionAttribute(name = Const.LOGIN_USER) Long userId,
             @RequestBody FriendRequestDto dto) {
-        return ResponseEntity.ok(friendService.findAll(page, size, dto));
+        return ResponseEntity.ok(friendService.findAll(page, size, userId, dto));
     }
 
     // 친구 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFriend(@PathVariable Long id) {
-        friendService.deleteFriend(id);
+    public ResponseEntity<Void> deleteFriend(@PathVariable Long id, @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
+        friendService.deleteFriend(id, userId);
         return ResponseEntity.ok().build();
     }
 
-    // TODO 친구 뉴스피드 조회
+    // 친구 뉴스피드 조회
+    @GetMapping("/posts")
+    public ResponseEntity<PaginationResponse<FriendsPostResponseDto>> findFriendsPosts(@RequestParam(defaultValue = "1") int page,
+                                                                                       @RequestParam(defaultValue = "10") int size,
+                                                                                       @SessionAttribute(name = Const.LOGIN_USER) Long userId,
+                                                                                       @RequestBody FriendsPostRequestDto dto) {
+        return ResponseEntity.ok(friendService.findFriendsPosts(page, size, userId, dto));
+    }
 }
