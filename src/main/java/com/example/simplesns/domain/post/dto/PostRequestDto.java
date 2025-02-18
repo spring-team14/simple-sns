@@ -5,9 +5,7 @@ public class PostRequestDto {
     private String content;
     private Long userId;
 
-    public Long getUserId() {
-        return userId;
-    }
+
 
     public String getTitle() {
         return title;
@@ -15,5 +13,13 @@ public class PostRequestDto {
 
     public String getContent() {
         return content;
+    }
+    public Long getUserId() {
+        return userId;
+    }
+    public PostRequestDto(String title, String content, Long userId) {
+        this.title = title;
+        this.content = content;
+        this.userId = userId;
     }
 }
