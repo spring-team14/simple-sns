@@ -20,7 +20,7 @@ public class CommentResponseDto {
         this.id = comment.getId();
         this.content = comment.getContent();
         this.imageUrl = comment.getImageUrl();
-        this.userName = comment.getUser().getUsername();
+        this.userName = comment.getUser().getName();
         this.createdAt = comment.getCreatedAt();
         this.replies = comment.getReplies().stream()
                 .map(CommentResponseDto::new)
