@@ -1,5 +1,6 @@
 package com.example.simplesns.domain.user.controller;
 
+import com.example.simplesns.common.dto.PaginationResponse;
 import com.example.simplesns.domain.user.dto.request.UserDeleteRequestDto;
 import com.example.simplesns.domain.user.dto.request.UserPasswordUpdateRequestDto;
 import com.example.simplesns.domain.user.dto.request.UserProfileRequestDto;
@@ -27,8 +28,10 @@ public class UserController {
 
     // 전체 유저 목록 조회
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponseDto>> findAll() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<PaginationResponse<UserResponseDto>> findAll(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(userService.findAll(page, size));
     }
 
     // 특정 유저 프로필 조회

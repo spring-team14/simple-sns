@@ -1,19 +1,20 @@
 package com.example.simplesns.domain.user.service;
 
 import com.example.simplesns.common.config.PasswordEncoder;
+import com.example.simplesns.common.dto.PaginationResponse;
 import com.example.simplesns.domain.user.dto.request.*;
 import com.example.simplesns.domain.user.dto.response.UserProfileResponseDto;
 import com.example.simplesns.domain.user.dto.response.UserResponseDto;
 import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,21 +46,10 @@ public class UserService {
 
     // 전체 유저 목록 조회
     @Transactional(readOnly = true)
-    public List<UserResponseDto> findAll() {
-        List<User> users = userRepository.findAll();
-
-        List<UserResponseDto> dtos = new ArrayList<>();
-        for (User user : users) {
-            dtos.add(new UserResponseDto(
-                    user.getId(),
-                    user.getEmail(),
-                    user.getName(),
-                    user.getBirthdate(),
-                    user.getCreatedAt(),
-                    user.getUpdatedAt()));
-        }
-
-        return dtos;
+    public PaginationResponse<UserResponseDto> findAll(int page, int size) {
+        PageRequest pageable = createPageable(page, size);
+        Page<User> usersPage = userRepository.findAll(pageable);
+        return new PaginationResponse<>(usersPage.map(UserResponseDto::new));
     }
 
     // 특정 유저 프로필 조회
@@ -153,5 +143,10 @@ public class UserService {
 
     private boolean isPasswordNotMatched(String inputPassword, String encodedPassword) {
         return !passwordEncoder.matches(inputPassword, encodedPassword);
+    }
+
+    private PageRequest createPageable(int page, int size) {
+        int enablePage = (page > 0) ? page - 1 : 0;
+        return PageRequest.of(enablePage, size, Sort.by("updatedAt").descending());
     }
 }
