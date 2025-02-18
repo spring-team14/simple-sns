@@ -54,4 +54,5 @@ public class User extends BaseEntity {
         this.image = image;
         this.mbti = mbti;
     }
+
 }

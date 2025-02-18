@@ -6,6 +6,6 @@ import lombok.Getter;
 public class ReqFriendRequestDto {
 
     // TODO 인증 구현 후 삭제
-    private Long fromId;
+    private Long toId;
     private Integer status;
 }
