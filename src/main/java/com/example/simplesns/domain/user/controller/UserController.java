@@ -1,6 +1,7 @@
 package com.example.simplesns.domain.user.controller;
 
 import com.example.simplesns.domain.user.dto.request.UserDeleteRequestDto;
+import com.example.simplesns.domain.user.dto.request.UserPasswordUpdateRequestDto;
 import com.example.simplesns.domain.user.dto.request.UserProfileRequestDto;
 import com.example.simplesns.domain.user.dto.request.UserSaveRequestDto;
 import com.example.simplesns.domain.user.dto.response.UserProfileResponseDto;
@@ -43,6 +44,12 @@ public class UserController {
         return ResponseEntity.ok(userService.updateProfile(userId, dto));
     }
 
+    // 특정 유저 비밀번호 수정
+    @PatchMapping("/users/{userId}/password")
+    public void updatePassword(
+            @PathVariable Long userId, @RequestBody UserPasswordUpdateRequestDto dto) {
+       userService.updatePassword(userId, dto);
+    }
 
     // 유저 삭제(회원탈퇴. 이메일&비밀번호 확인 필요)
     @DeleteMapping("/users/{userId}")
