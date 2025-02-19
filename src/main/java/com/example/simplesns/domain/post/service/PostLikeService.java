@@ -6,6 +6,9 @@ import com.example.simplesns.domain.post.repository.PostLikeRepository;
 import com.example.simplesns.domain.post.repository.PostRepository;
 import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
+import com.example.simplesns.exception.custom.post.PostDeletedException;
+import com.example.simplesns.exception.custom.post.PostNotFoundException;
+import com.example.simplesns.exception.custom.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,23 +28,33 @@ public class PostLikeService {
     @Transactional
     public String toggleLike(Long postId, Long userId) {
         Optional<PostLike> postLike = postLikeRepository.findByPostIdAndUserId(postId, userId);
-        // TODO: deletedAt 검증
+
         if (postLike.isPresent()) {
             postLikeRepository.delete(postLike.get());
             decreaseLikeCount(postId);
             return "좋아요 취소";
         }
         else {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다."));
-            Post post = postRepository.findById(postId).orElseThrow(
-                    () -> new IllegalArgumentException("그 id 게시글 없음")
-            );
-
+            User user = findUser(userId);
+            Post post = findPost(userId);
             postLikeRepository.save(new PostLike(user, post));
             increaseLikeCount(postId);
             return "좋아요 등록";
         }
+    }
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    private Post findPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+        if (post.getDeletedAt() != null) {
+            throw new PostDeletedException(postId);
+        }
+        return post;
     }
 
     private void increaseLikeCount(Long postId) {
