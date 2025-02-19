@@ -5,6 +5,7 @@ import com.example.simplesns.common.dto.PaginationResponse;
 import com.example.simplesns.domain.comment.dto.request.CommentRequestDto;
 import com.example.simplesns.domain.comment.dto.response.CommentResponseDto;
 import com.example.simplesns.domain.comment.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class CommentController {
 
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentResponseDto> createComment(@PathVariable Long postId,
-                                                            @RequestBody CommentRequestDto dto,
+                                                            @Valid @RequestBody CommentRequestDto dto,
                                                             @SessionAttribute(name = Const.LOGIN_USER) Long userId) { // ✅ userId 추가
         return ResponseEntity.ok(commentService.createComment(postId, dto, userId));
     }
@@ -38,8 +39,8 @@ public class CommentController {
 
     @PatchMapping("/comments/{id}")
     public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long id,
-                                              @RequestBody CommentRequestDto dto,
-                                              @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
+                                                            @Valid @RequestBody CommentRequestDto dto,
+                                                            @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
         return ResponseEntity.ok(commentService.updateComment(id, dto, userId));
     }
 

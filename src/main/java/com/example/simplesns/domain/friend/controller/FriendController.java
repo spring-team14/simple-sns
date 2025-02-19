@@ -8,12 +8,13 @@ import com.example.simplesns.domain.friend.dto.response.FriendsPostResponseDto;
 import com.example.simplesns.domain.friend.dto.response.ReqFriendResponseDto;
 import com.example.simplesns.domain.friend.dto.response.createFriendReqResponseDto;
 import com.example.simplesns.domain.friend.service.FriendService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/friends")
+@RequestMapping("/friends")
 @RequiredArgsConstructor
 public class FriendController {
 
@@ -22,7 +23,7 @@ public class FriendController {
     // 친구 등록
     @PostMapping("/request")
     public ResponseEntity<createFriendReqResponseDto> createFriendReq(@SessionAttribute(name = Const.LOGIN_USER) Long userId,
-                                                                      @RequestBody createFriendReqRequestDto dto) {
+                                                                      @Valid @RequestBody createFriendReqRequestDto dto) {
         return ResponseEntity.ok(friendService.createFriendReq(userId, dto));
     }
 
@@ -40,7 +41,7 @@ public class FriendController {
     @PatchMapping("/request/{id}")
     public ResponseEntity<Void> signOffFriend(@PathVariable Long id,
                                               @SessionAttribute(name = Const.LOGIN_USER) Long userId,
-                                              @RequestBody SignOffFriendRequestDto dto) {
+                                              @Valid @RequestBody SignOffFriendRequestDto dto) {
         friendService.signOffFriend(id, userId, dto);
         return ResponseEntity.ok().build();
     }
@@ -51,7 +52,7 @@ public class FriendController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @SessionAttribute(name = Const.LOGIN_USER) Long userId,
-            @RequestBody FriendRequestDto dto) {
+            @RequestBody FindFriendRequestDto dto) {
         return ResponseEntity.ok(friendService.findAll(page, size, userId, dto));
     }
 
@@ -67,7 +68,7 @@ public class FriendController {
     public ResponseEntity<PaginationResponse<FriendsPostResponseDto>> findFriendsPosts(@RequestParam(defaultValue = "1") int page,
                                                                                        @RequestParam(defaultValue = "10") int size,
                                                                                        @SessionAttribute(name = Const.LOGIN_USER) Long userId,
-                                                                                       @RequestBody FriendsPostRequestDto dto) {
+                                                                                       @Valid @RequestBody FriendsPostRequestDto dto) {
         return ResponseEntity.ok(friendService.findFriendsPosts(page, size, userId, dto));
     }
 }

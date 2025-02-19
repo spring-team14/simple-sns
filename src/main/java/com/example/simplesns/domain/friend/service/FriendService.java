@@ -110,7 +110,7 @@ public class FriendService {
     }
 
     @Transactional(readOnly = true)
-    public PaginationResponse<FriendResponseDto> findAll(int page, int size, Long userId, FriendRequestDto dto) {
+    public PaginationResponse<FriendResponseDto> findAll(int page, int size, Long userId, FindFriendRequestDto dto) {
         PageRequest pageable = createPageable(page, size);
         Page<Friend> friendsPage = friendRepository.findAllByUserId(pageable, userId, dto.getEmail(), dto.getName());
         return new PaginationResponse<>(friendsPage.map(FriendResponseDto::new));
