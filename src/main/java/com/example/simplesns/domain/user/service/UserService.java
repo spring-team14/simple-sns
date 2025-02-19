@@ -54,7 +54,7 @@ public class UserService {
     }
 
     // 특정 유저 프로필 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public UserProfileResponseDto findOne(Long userId) {
         User user = getUser(userId);
 
