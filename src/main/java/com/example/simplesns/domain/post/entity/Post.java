@@ -26,16 +26,25 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    private int likeCount = 0;
 
     public Post(String title, String content, User user, LocalDateTime deletedAt) {
         this.title = title;
         this.content = content;
         this.user = user;
-        this.deletedAt = LocalDateTime.now();
+        this.deletedAt = deletedAt;
     }
 
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount ++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount --;
     }
 }

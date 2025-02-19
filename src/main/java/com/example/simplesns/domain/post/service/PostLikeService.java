@@ -37,16 +37,14 @@ public class PostLikeService {
         if (postLike.isPresent()) {
             postLikeRepository.delete(postLike.get());
 
-            // TODO: post Entity 좋아요 수 감소
-            // post.decreaseLikeCount();
+            post.decreaseLikeCount();
 
             return "좋아요 취소";
         } else {
             User user = findUser(userId);
             postLikeRepository.save(new PostLike(user, post));
 
-            // TODO: post Entity 좋아요 수 증가
-            // post.increaseLikeCount();
+            post.increaseLikeCount();
 
             return "좋아요 등록";
         }

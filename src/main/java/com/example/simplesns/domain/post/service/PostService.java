@@ -7,15 +7,16 @@ import com.example.simplesns.domain.post.entity.Post;
 import com.example.simplesns.domain.post.repository.PostRepository;
 import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import com.example.simplesns.exception.custom.post.PostDeletedException;
+import com.example.simplesns.exception.custom.post.PostNotFoundException;
+import com.example.simplesns.exception.custom.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,31 +44,34 @@ public class PostService {
                 savedPost.getContent(),
                 savedPost.getCreatedAt(),
                 savedPost.getUpdatedAt(),
-                savedPost.getUser().getId());
+                savedPost.getUser().getId(),
+                savedPost.getLikeCount()
+        );
     }
 
     // 게시글 조회 (페이징 처리) - Pageable 사용
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public PaginationResponse<PostResponseDto> findAll(Pageable pageable) {
         // Post 게시글을 페이징하여 조회
         Page<Post> postsPage = postRepository.findAll(pageable);
 
         // 결과를 PaginationResponse에 래핑하여 반환
-        return new PaginationResponse<>(postsPage.map(post -> new PostResponseDto(
-                post.getId(),
-                post.getTitle(),
-                post.getContent(),
-                post.getCreatedAt(),
-                post.getUpdatedAt(),
-                post.getUser().getId())));
+        return new PaginationResponse<>(
+                postsPage.map(post -> new PostResponseDto(
+                    post.getId(),
+                    post.getTitle(),
+                    post.getContent(),
+                    post.getCreatedAt(),
+                    post.getUpdatedAt(),
+                    post.getUser().getId(),
+                    post.getLikeCount())
+                ));
     }
 
     // ID로 게시글 조회
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public PostResponseDto findById(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("그 id 게시글 없음")
-        );
+        Post post = findPost(id);
 
         // 조회된 Post의 정보를 포함한 ResponseDto 반환
         return new PostResponseDto(
@@ -76,7 +80,8 @@ public class PostService {
                 post.getContent(),
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
-                post.getUser().getId());
+                post.getUser().getId(),
+                post.getLikeCount());
     }
 
     // 게시글 수정
@@ -97,7 +102,8 @@ public class PostService {
                 post.getContent(),
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
-                post.getUser().getId());
+                post.getUser().getId(),
+                post.getLikeCount());
     }
 
     // 게시글 삭제
@@ -114,5 +120,19 @@ public class PostService {
     private PageRequest createPageable(int page, int size) {
         int enablePage = (page > 0) ? page - 1 : 0;  // 페이지 번호는 0부터 시작하므로 1을 빼줍니다.
         return PageRequest.of(enablePage, size, Sort.by("createdAt").descending());  // 최신 게시글부터 정렬
+    }
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    private Post findPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+        if (post.getDeletedAt() != null) {
+            throw new PostDeletedException(postId);
+        }
+        return post;
     }
 }
