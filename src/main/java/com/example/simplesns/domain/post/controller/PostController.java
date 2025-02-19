@@ -1,5 +1,6 @@
 package com.example.simplesns.domain.post.controller;
 
+import com.example.simplesns.common.consts.Const;
 import com.example.simplesns.domain.post.dto.PostRequestDto;
 import com.example.simplesns.domain.post.dto.PostResponseDto;
 import com.example.simplesns.domain.post.service.PostService;
@@ -20,7 +21,8 @@ public class PostController {
     @GetMapping("/posts")
     public ResponseEntity<PaginationResponse<PostResponseDto>> findAll(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size)
+    {
 
         Pageable pageable = PageRequest.of(page - 1, size); // 0-based index로 페이지 시작
 
@@ -32,8 +34,9 @@ public class PostController {
 
     // 게시글 생성
     @PostMapping("/posts")
-    public ResponseEntity<PostResponseDto> save(@RequestBody PostRequestDto dto) {
-        PostResponseDto post = postService.save(dto);
+    public ResponseEntity<PostResponseDto> save(@RequestBody PostRequestDto dto,
+                                                @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
+        PostResponseDto post = postService.save(dto, userId);
         return ResponseEntity.ok(post);
     }
 
@@ -48,15 +51,17 @@ public class PostController {
     @PutMapping("/posts/{id}")
     public ResponseEntity<PostResponseDto> update(
             @PathVariable Long id,
-            @RequestBody PostRequestDto dto) {
-        PostResponseDto updatedPost = postService.update(id, dto);
+            @RequestBody PostRequestDto dto,
+            @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
+        PostResponseDto updatedPost = postService.update(id, userId, dto);
         return ResponseEntity.ok(updatedPost);
     }
 
     // 게시글 삭제
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        postService.deleteById(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id,
+                                       @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
+        postService.deleteById(id, userId);
         return ResponseEntity.noContent().build();
     }
 }

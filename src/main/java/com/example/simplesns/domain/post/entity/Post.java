@@ -28,11 +28,10 @@ public class Post extends BaseEntity {
     private User user;
     private int likeCount = 0;
 
-    public Post(String title, String content, User user, LocalDateTime deletedAt) {
+    public Post(String title, String content, User user) {
         this.title = title;
         this.content = content;
         this.user = user;
-        this.deletedAt = deletedAt;
     }
 
     public void update(String title, String content) {
