@@ -50,7 +50,7 @@ public class CommentService {
     public PaginationResponse<CommentResponseDto> findByPost(int page, int size, Long postId, Long userId) {
         findPost(postId);
         PageRequest pageable = createPageable(page, size);
-        Page<Comment> commentsPages = commentRepository.findByPostId(pageable, postId);
+        Page<Comment> commentsPages = commentRepository.findByPostIdAndDeletedAtIsNull(pageable, postId);
 
         List<Long> commentIdList = commentsPages.getContent()
                 .stream()
@@ -59,7 +59,9 @@ public class CommentService {
 
         List<CommentLike> userLikedList = commentLikeRepository.findByUserIdAndCommentIdIn(userId, commentIdList);
 
-        Set<Long> likedCommentIdList = userLikedList.stream().map(liked -> liked.getComment().getId())
+        Set<Long> likedCommentIdList = userLikedList
+                .stream()
+                .map(liked -> liked.getComment().getId())
                 .collect(Collectors.toSet());
 
         List<CommentResponseDto> commentResponseDtoList = commentsPages.stream()
@@ -101,6 +103,7 @@ public class CommentService {
             throw new UnauthorizedException();
         }
         commentRepository.deleteById(commentId);
+        commentLikeRepository.deleteByCommentId(commentId);
     }
 
     private Comment findComment(Long commentId) {
