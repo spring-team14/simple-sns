@@ -33,7 +33,7 @@ public class PostService {
         );
 
         // Post 객체 생성
-        Post post = new Post(dto.getTitle(), dto.getContent(), user,LocalDateTime.now() );
+        Post post = new Post(dto.getTitle(), dto.getContent(), user, null);  // deletedAt을 null로 설정
         Post savedPost = postRepository.save(post);
 
         // 생성된 Post의 ID, title, content, createdAt, updatedAt을 포함한 ResponseDto 반환
@@ -43,7 +43,7 @@ public class PostService {
                 savedPost.getContent(),
                 savedPost.getCreatedAt(),
                 savedPost.getUpdatedAt(),
-                post.getUser().getId());
+                savedPost.getUser().getId());
     }
 
     // 게시글 조회 (페이징 처리) - Pageable 사용
@@ -114,19 +114,5 @@ public class PostService {
     private PageRequest createPageable(int page, int size) {
         int enablePage = (page > 0) ? page - 1 : 0;  // 페이지 번호는 0부터 시작하므로 1을 빼줍니다.
         return PageRequest.of(enablePage, size, Sort.by("createdAt").descending());  // 최신 게시글부터 정렬
-    }
-
-    // 추가된 메서드: 페이지네이션과 관련된 메서드
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public PaginationResponse<PostResponseDto> getPosts(Pageable pageable) {
-        Page<Post> postsPage = postRepository.findAll(pageable);
-
-        return new PaginationResponse<>(postsPage.map(post -> new PostResponseDto(
-                post.getId(),
-                post.getTitle(),
-                post.getContent(),
-                post.getCreatedAt(),
-                post.getUpdatedAt(),
-                post.getUser().getId())));
     }
 }
