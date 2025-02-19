@@ -7,6 +7,10 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
 
+    INVALID_NEWPASSWORD(HttpStatus.UNAUTHORIZED, "새 비밀번호는 기존 비밀번호와 다르게 설정해야 합니다."),
+
+    INVALID_EMAIL(HttpStatus.UNAUTHORIZED, "이메일이 일치하지 않습니다."),
+
     USER_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, "해당 ID의 멤버를 찾을 수 없습니다."),
 
     USER_NOT_FOUND_BY_EMAIL(HttpStatus.NOT_FOUND, "해당 이메일의 멤버를 찾을 수 없습니다."),
