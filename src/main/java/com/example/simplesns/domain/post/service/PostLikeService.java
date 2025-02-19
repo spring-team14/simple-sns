@@ -6,6 +6,7 @@ import com.example.simplesns.domain.post.repository.PostLikeRepository;
 import com.example.simplesns.domain.post.repository.PostRepository;
 import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
+import com.example.simplesns.exception.custom.like.SelfLikeNotAllowedException;
 import com.example.simplesns.exception.custom.post.PostDeletedException;
 import com.example.simplesns.exception.custom.post.PostNotFoundException;
 import com.example.simplesns.exception.custom.user.UserNotFoundException;
@@ -27,18 +28,26 @@ public class PostLikeService {
 
     @Transactional
     public String toggleLike(Long postId, Long userId) {
-        Optional<PostLike> postLike = postLikeRepository.findByPostIdAndUserId(postId, userId);
+        Post post = findPost(postId);
+        if (post.getUser().getId().equals(userId)) {
+            throw new SelfLikeNotAllowedException("본인 게시글에는 좋아요를 누를 수 없습니다.");
+        }
 
+        Optional<PostLike> postLike = postLikeRepository.findByPostIdAndUserId(postId, userId);
         if (postLike.isPresent()) {
             postLikeRepository.delete(postLike.get());
-            decreaseLikeCount(postId);
+
+            // TODO: post Entity 좋아요 수 감소
+            // post.decreaseLikeCount();
+
             return "좋아요 취소";
-        }
-        else {
+        } else {
             User user = findUser(userId);
-            Post post = findPost(userId);
             postLikeRepository.save(new PostLike(user, post));
-            increaseLikeCount(postId);
+
+            // TODO: post Entity 좋아요 수 증가
+            // post.increaseLikeCount();
+
             return "좋아요 등록";
         }
     }
@@ -55,18 +64,5 @@ public class PostLikeService {
             throw new PostDeletedException(postId);
         }
         return post;
-    }
-
-    private void increaseLikeCount(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(
-                () -> new IllegalArgumentException("그 id 게시글 없음")
-        );
-        //post.increaseLikeCount();
-    }
-    private void decreaseLikeCount(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(
-                () -> new IllegalArgumentException("그 id 게시글 없음")
-        );
-        //post.decreaseLikeCount();
     }
 }
