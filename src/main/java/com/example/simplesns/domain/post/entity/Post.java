@@ -13,24 +13,24 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "post")
+@Table(name = "posts")
 
-@SQLDelete(sql = "UPDATE post SET deleted_at = now() WHERE id = ?")
+@SQLDelete(sql = "UPDATE posts SET deleted_at = now() WHERE id = ?")
 public class Post extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String content;
-    private LocalDateTime deleted_at;
+    private LocalDateTime deletedAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Post(String title, String content, User user, LocalDateTime deleted_at) {
+    public Post(String title, String content, User user, LocalDateTime deletedAt) {
         this.title = title;
         this.content = content;
         this.user = user;
-        this.deleted_at = LocalDateTime.now();
+        this.deletedAt = LocalDateTime.now();
     }
 
     public void update(String title, String content) {
