@@ -4,13 +4,18 @@ import com.example.simplesns.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
 @NoArgsConstructor
 @Table(name = "users")
+@SQLDelete(sql = "UPDATE users SET deleted_at = now() WHERE id = ?")
+@Where(clause = "deleted_at IS NULL")
 public class User extends BaseEntity {
 
     @Id
@@ -30,8 +35,9 @@ public class User extends BaseEntity {
     private String mbti;
 
     @Column(nullable = false)
-
     private String password;
+
+    private LocalDateTime deletedAt;
 
     public User(String email, String name, LocalDate birthdate, String image, String mbti, String password) {
         this.email = email;
