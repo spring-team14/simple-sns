@@ -18,12 +18,4 @@ public class GlobalExceptionHandler {
                 .status(ex.getErrorCode().getHttpStatus())
                 .body(ErrorResponse.of(ex.getErrorCode(), ex.getMessage()));
     }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-        log.error(ex.getMessage(), ex);
-        return ResponseEntity
-                .status(ErrorCode.UNKNOWN.getHttpStatus())
-                .body(ErrorResponse.of(ErrorCode.UNKNOWN, ErrorCode.UNKNOWN.getMessage()));
-    }
 }
