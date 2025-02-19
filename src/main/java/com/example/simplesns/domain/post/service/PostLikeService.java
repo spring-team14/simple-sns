@@ -2,7 +2,7 @@ package com.example.simplesns.domain.post.service;
 
 import com.example.simplesns.domain.post.entity.Post;
 import com.example.simplesns.domain.post.entity.PostLike;
-import com.example.simplesns.domain.post.repository.PostLikesRepository;
+import com.example.simplesns.domain.post.repository.PostLikeRepository;
 import com.example.simplesns.domain.post.repository.PostRepository;
 import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
@@ -16,18 +16,18 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class PostLikesService {
+public class PostLikeService {
 
-    private final PostLikesRepository postLikesRepository;
+    private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
     @Transactional
     public String toggleLike(Long postId, Long userId) {
-        Optional<PostLike> postLike = postLikesRepository.findByPostIdAndUserId(postId, userId);
-
+        Optional<PostLike> postLike = postLikeRepository.findByPostIdAndUserId(postId, userId);
+        // TODO: deletedAt 검증
         if (postLike.isPresent()) {
-            postLikesRepository.delete(postLike.get());
+            postLikeRepository.delete(postLike.get());
             decreaseLikeCount(postId);
             return "좋아요 취소";
         }
@@ -38,7 +38,7 @@ public class PostLikesService {
                     () -> new IllegalArgumentException("그 id 게시글 없음")
             );
 
-            postLikesRepository.save(new PostLike(user, post));
+            postLikeRepository.save(new PostLike(user, post));
             increaseLikeCount(postId);
             return "좋아요 등록";
         }
