@@ -16,6 +16,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // UserId로 게시글을 찾는 메소드 추가 (예시로 작성)
     Page<Post> findAllByUserId(PageRequest pageable, Long userId);
 
+    Page<Post> findByDeletedAtIsNull(Pageable pageable);
+
     // 특정 게시글을 UserId로 찾는 예시 메소드 추가
     Optional<Post> findByUserId(Long userId);
 

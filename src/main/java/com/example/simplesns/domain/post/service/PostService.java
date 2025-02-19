@@ -4,6 +4,8 @@ import com.example.simplesns.common.dto.PaginationResponse;
 import com.example.simplesns.domain.post.dto.PostRequestDto;
 import com.example.simplesns.domain.post.dto.PostResponseDto;
 import com.example.simplesns.domain.post.entity.Post;
+import com.example.simplesns.domain.post.entity.PostLike;
+import com.example.simplesns.domain.post.repository.PostLikeRepository;
 import com.example.simplesns.domain.post.repository.PostRepository;
 import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
@@ -12,12 +14,13 @@ import com.example.simplesns.exception.custom.post.PostDeletedException;
 import com.example.simplesns.exception.custom.post.PostNotFoundException;
 import com.example.simplesns.exception.custom.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final PostLikeRepository postLikeRepository;
 
     // 게시글 생성
     @Transactional
@@ -50,37 +54,45 @@ public class PostService {
 
     // 게시글 조회 (페이징 처리) - Pageable 사용
     @Transactional(readOnly = true)
-    public PaginationResponse<PostResponseDto> findAll(Pageable pageable) {
+    public PaginationResponse<PostResponseDto> findAll(Pageable pageable, Long userId) {
         // Post 게시글을 페이징하여 조회
-        Page<Post> postsPage = postRepository.findAll(pageable);
+        Page<Post> postsPage = postRepository.findByDeletedAtIsNull(pageable);
+
+        List<Long> postIdList = postsPage.getContent()
+                .stream()
+                .map(Post::getId)
+                .toList();
+
+        List<PostLike> userLikedList = postLikeRepository.findByUserIdAndPostIdIn(userId, postIdList);
+
+        Set<Long> likedPostIdList = userLikedList
+                .stream()
+                .map(postLike -> postLike.getPost().getId())
+                .collect(Collectors.toSet());
+
+        List<PostResponseDto> postResponseDtoList = postsPage.stream()
+                .map(post -> {
+                    PostResponseDto postResponseDto = new PostResponseDto(post);
+                    boolean likedByUser = likedPostIdList.contains(post.getId());
+                    postResponseDto.setLikedByUser(likedByUser);
+                    return postResponseDto;
+                })
+                .toList();
 
         // 결과를 PaginationResponse에 래핑하여 반환
         return new PaginationResponse<>(
-                postsPage.map(post -> new PostResponseDto(
-                    post.getId(),
-                    post.getTitle(),
-                    post.getContent(),
-                    post.getCreatedAt(),
-                    post.getUpdatedAt(),
-                    post.getUser().getId(),
-                    post.getLikeCount())
-                ));
+                new PageImpl<>(postResponseDtoList, pageable, postsPage.getTotalElements())
+        );
     }
 
     // ID로 게시글 조회
     @Transactional(readOnly = true)
-    public PostResponseDto findById(Long id) {
-        Post post = findPost(id);
-
+    public PostResponseDto findById(Long id, Long userId) {
+        PostResponseDto postResponseDto = new PostResponseDto(findPost(id));
+        boolean userLiked = postLikeRepository.existsByPostIdAndUserId(id, userId);
+        postResponseDto.setLikedByUser(userLiked);
         // 조회된 Post의 정보를 포함한 ResponseDto 반환
-        return new PostResponseDto(
-                post.getId(),
-                post.getTitle(),
-                post.getContent(),
-                post.getCreatedAt(),
-                post.getUpdatedAt(),
-                post.getUser().getId(),
-                post.getLikeCount());
+        return postResponseDto;
     }
 
     // 게시글 수정
@@ -114,6 +126,7 @@ public class PostService {
         }
 
         postRepository.deleteById(id);
+        postLikeRepository.deleteByPostId(id);
     }
 
     // PageRequest 생성 (페이징 처리에 필요한 메소드)
