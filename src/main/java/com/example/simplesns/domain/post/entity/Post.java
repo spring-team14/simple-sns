@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @Table(name = "posts")
-
 @SQLDelete(sql = "UPDATE posts SET deleted_at = now() WHERE id = ?")
+
 public class Post extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,5 +39,3 @@ public class Post extends BaseEntity {
         this.content = content;
     }
 }
-
-
