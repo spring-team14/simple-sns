@@ -47,6 +47,7 @@ public class UserService {
     // 전체 유저 목록 조회
     @Transactional(readOnly = true)
     public PaginationResponse<UserResponseDto> findAll(int page, int size) {
+
         PageRequest pageable = createPageable(page, size);
         Page<User> usersPage = userRepository.findAll(pageable);
         return new PaginationResponse<>(usersPage.map(UserResponseDto::new));
@@ -55,8 +56,7 @@ public class UserService {
     // 특정 유저 프로필 조회
     @Transactional
     public UserProfileResponseDto findOne(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다."));
+        User user = getUser(userId);
 
         return new UserProfileResponseDto(
                 user.getId(),
@@ -71,8 +71,7 @@ public class UserService {
     // 특정 유저 프로필 수정(이메일 수정 불가, 비밀번호 확인 필요)
     @Transactional
     public UserProfileResponseDto updateProfile(Long userId, UserProfileRequestDto dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다."));
+        User user = getUser(userId);
 
         if (isPasswordNotMatched(dto.getPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
@@ -97,8 +96,7 @@ public class UserService {
     // 특정 유저 비밀번호 수정
     @Transactional
     public void updatePassword(Long userId, UserPasswordUpdateRequestDto dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다."));
+        User user = getUser(userId);
 
         if (isPasswordNotMatched(dto.getCurrentPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "기존 비밀번호가 일치하지 않습니다.");
@@ -115,8 +113,7 @@ public class UserService {
     // 유저 삭제(회원탈퇴. 이메일&비밀번호 확인 필요)
     @Transactional
     public void delete(Long userId, UserDeleteRequestDto dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다."));
+        User user = getUser(userId);
 
         if (!dto.getEmail().equals(user.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이메일이 일치하지 않습니다.");
@@ -139,6 +136,11 @@ public class UserService {
         }
 
         return user.getId();
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다."));
     }
 
     private boolean isPasswordNotMatched(String inputPassword, String encodedPassword) {
