@@ -15,8 +15,8 @@ import com.example.simplesns.domain.friend.repository.FriendRequestRepository;
 import com.example.simplesns.domain.post.entity.Post;
 import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
-import com.example.simplesns.exception.custom.UnauthorizedException;
-import com.example.simplesns.exception.custom.UserNotFoundException;
+import com.example.simplesns.exception.custom.auth.UnauthorizedException;
+import com.example.simplesns.exception.custom.user.UserNotFoundException;
 import com.example.simplesns.exception.custom.friend.FriendNotFoundException;
 import com.example.simplesns.exception.custom.friend.FriendRequestAlreadyExistException;
 import com.example.simplesns.exception.custom.friend.FriendRequestNotFoundException;
@@ -111,7 +111,7 @@ public class FriendService {
     public PaginationResponse<FriendResponseDto> findAll(int page, int size, Long userId, FriendRequestDto dto) {
         PageRequest pageable = createPageable(page, size);
         Page<Friend> friendsPage = friendRepository.findAllByUserId(pageable, userId, dto.getEmail(), dto.getName());
-        return new PaginationResponse<>(friendsPage.map(FriendResponseDto::new));
+        return new PaginationResponse<>(    friendsPage.map(FriendResponseDto::new));
     }
 
     @Transactional
