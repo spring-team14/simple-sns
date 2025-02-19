@@ -25,13 +25,15 @@ public class CommentController {
     @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<PaginationResponse<CommentResponseDto>> findByPost(@PathVariable Long postId,
                                                                              @RequestParam(defaultValue = "1") int page,
-                                                                             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(commentService.findByPost(page, size, postId));
+                                                                             @RequestParam(defaultValue = "10") int size,
+                                                                             @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
+        return ResponseEntity.ok(commentService.findByPost(page, size, postId, userId));
     }
 
     @GetMapping("/comments/{id}")
-    public ResponseEntity<CommentResponseDto> findOne(@PathVariable Long id) {
-        return ResponseEntity.ok(commentService.findOne(id));
+    public ResponseEntity<CommentResponseDto> findOne(@PathVariable Long id,
+                                                      @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
+        return ResponseEntity.ok(commentService.findOne(id, userId));
     }
 
     @PatchMapping("/comments/{id}")

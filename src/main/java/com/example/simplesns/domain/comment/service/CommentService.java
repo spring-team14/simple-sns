@@ -4,6 +4,8 @@ import com.example.simplesns.common.dto.PaginationResponse;
 import com.example.simplesns.domain.comment.dto.request.CommentRequestDto;
 import com.example.simplesns.domain.comment.dto.response.CommentResponseDto;
 import com.example.simplesns.domain.comment.entity.Comment;
+import com.example.simplesns.domain.comment.entity.CommentLike;
+import com.example.simplesns.domain.comment.repository.CommentLikeRepository;
 import com.example.simplesns.domain.comment.repository.CommentRepository;
 import com.example.simplesns.domain.post.entity.Post;
 import com.example.simplesns.domain.post.repository.PostRepository;
@@ -17,12 +19,15 @@ import com.example.simplesns.exception.custom.post.PostNotFoundException;
 import com.example.simplesns.exception.custom.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +36,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository; // ✅ 추가
+    private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
     public CommentResponseDto createComment(Long postId, CommentRequestDto dto, Long userId) { // ✅ userId로 변경
@@ -41,16 +47,41 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public PaginationResponse<CommentResponseDto> findByPost(int page, int size, Long postId) {
+    public PaginationResponse<CommentResponseDto> findByPost(int page, int size, Long postId, Long userId) {
         findPost(postId);
         PageRequest pageable = createPageable(page, size);
         Page<Comment> commentsPages = commentRepository.findByPostId(pageable, postId);
-        return new PaginationResponse<>(commentsPages.map(CommentResponseDto::new));
+
+        List<Long> commentIdList = commentsPages.getContent()
+                .stream()
+                .map(Comment::getId)
+                .toList();
+
+        List<CommentLike> userLikedList = commentLikeRepository.findByUserIdAndCommentIdIn(userId, commentIdList);
+
+        Set<Long> likedCommentIdList = userLikedList.stream().map(liked -> liked.getComment().getId())
+                .collect(Collectors.toSet());
+
+        List<CommentResponseDto> commentResponseDtoList = commentsPages.stream()
+                .map(comment -> {
+                    CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
+                    boolean likedByUser = likedCommentIdList.contains(comment.getId());
+                    commentResponseDto.setLikedByUser(likedByUser);
+                    return commentResponseDto;
+                })
+                .toList();
+
+        return new PaginationResponse<>(
+                new PageImpl<>(commentResponseDtoList, pageable, commentsPages.getTotalElements())
+        );
     }
 
     @Transactional(readOnly = true)
-    public CommentResponseDto findOne(Long id) {
-        return new CommentResponseDto(findComment(id));
+    public CommentResponseDto findOne(Long id, Long userId) {
+        CommentResponseDto commentResponseDto = new CommentResponseDto(findComment(id));
+        boolean userLiked = commentLikeRepository.existsByCommentIdAndUserId(id, userId);
+        commentResponseDto.setLikedByUser(userLiked);
+        return commentResponseDto;
     }
 
     @Transactional
