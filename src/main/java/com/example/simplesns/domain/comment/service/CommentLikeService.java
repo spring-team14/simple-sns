@@ -8,6 +8,7 @@ import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
 import com.example.simplesns.exception.custom.comment.CommentDeletedException;
 import com.example.simplesns.exception.custom.comment.CommentNotFoundException;
+import com.example.simplesns.exception.custom.like.SelfLikeNotAllowedException;
 import com.example.simplesns.exception.custom.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,19 +26,20 @@ public class CommentLikeService {
 
     @Transactional
     public String toggleLike(Long commentId, Long userId) {
+        Comment comment = findComment(commentId);
+        if (comment.getUser().getId().equals(userId)) {
+            throw new SelfLikeNotAllowedException("본인 댓글에는 좋아요를 누를 수 없습니다.");
+        }
+
         Optional<CommentLike> commentLike = commentLikeRepository.findByUserIdAndCommentId(userId, commentId);
-        
         if (commentLike.isPresent()) {
             commentLikeRepository.delete(commentLike.get());
 
-            Comment comment = findComment(commentId);
             comment.decreaseLikeCount();
 
             return "좋아요 취소";
-        }
-        else {
+        } else {
             User user = findUser(userId);
-            Comment comment = findComment(commentId);
             commentLikeRepository.save(new CommentLike(user, comment));
 
             comment.increaseLikeCount();
