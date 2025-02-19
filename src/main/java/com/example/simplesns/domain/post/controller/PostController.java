@@ -1,10 +1,11 @@
 package com.example.simplesns.domain.post.controller;
 
 import com.example.simplesns.common.consts.Const;
-import com.example.simplesns.domain.post.dto.PostRequestDto;
-import com.example.simplesns.domain.post.dto.PostResponseDto;
+import com.example.simplesns.domain.post.dto.request.PostRequestDto;
+import com.example.simplesns.domain.post.dto.response.PostResponseDto;
 import com.example.simplesns.domain.post.service.PostService;
 import com.example.simplesns.common.dto.PaginationResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +34,7 @@ public class PostController {
 
     // 게시글 생성
     @PostMapping("/posts")
-    public ResponseEntity<PostResponseDto> save(@RequestBody PostRequestDto dto,
+    public ResponseEntity<PostResponseDto> save(@Valid @RequestBody PostRequestDto dto,
                                                 @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
         PostResponseDto post = postService.save(dto, userId);
         return ResponseEntity.ok(post);
@@ -49,10 +50,9 @@ public class PostController {
 
     // 게시글 수정
     @PutMapping("/posts/{id}")
-    public ResponseEntity<PostResponseDto> update(
-            @PathVariable Long id,
-            @RequestBody PostRequestDto dto,
-            @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
+    public ResponseEntity<PostResponseDto> update(@PathVariable Long id,
+                                                  @Valid @RequestBody PostRequestDto dto,
+                                                  @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
         PostResponseDto updatedPost = postService.update(id, userId, dto);
         return ResponseEntity.ok(updatedPost);
     }
