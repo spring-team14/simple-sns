@@ -31,6 +31,8 @@ public class Comment extends BaseEntity {
 
     private String content;  // 댓글 내용
 
+    private int likeCount = 0;  // 댓글 좋아요 수
+
     private LocalDateTime deletedAt;
 
     // 생성자 (일반 댓글)
@@ -42,5 +44,13 @@ public class Comment extends BaseEntity {
 
     public void update(String content) {
         this.content = content;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount ++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount --;
     }
 }
