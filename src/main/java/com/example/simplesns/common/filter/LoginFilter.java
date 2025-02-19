@@ -56,9 +56,6 @@ public class LoginFilter implements Filter {
     }
 
     private boolean isWhiteList(String requestURI) {
-        //return PatternMatchUtils.simpleMatch(WHITE_LIST, requestURI);
-        return true;
-        // TODO: 현재는 모든 요청을 화이트리스트로 처리하여 로그인 필터 무력화 (개발/테스트용)
-        // 추후 특정 URL만 허용하도록 변경 필요
+        return PatternMatchUtils.simpleMatch(WHITE_LIST, requestURI);
     }
 }
