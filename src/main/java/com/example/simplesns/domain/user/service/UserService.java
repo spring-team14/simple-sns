@@ -7,6 +7,9 @@ import com.example.simplesns.domain.user.dto.response.UserProfileResponseDto;
 import com.example.simplesns.domain.user.dto.response.UserResponseDto;
 import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
+import com.example.simplesns.exception.custom.user.UserNotFoundException;
+import com.example.simplesns.exception.custom.user.UserPasswordException;
+import com.example.simplesns.exception.custom.user.UserSaveAlreadyExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +30,7 @@ public class UserService {
     @Transactional
     public UserResponseDto sava(UserSaveRequestDto dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 이메일은 이미 사용중입니다.");
+            throw new UserSaveAlreadyExistException();
         }
 
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
@@ -74,7 +77,7 @@ public class UserService {
         User user = getUser(userId);
 
         if (isPasswordNotMatched(dto.getPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
+            throw new UserPasswordException();
         }
 
         user.updateProfile(
@@ -99,7 +102,7 @@ public class UserService {
         User user = getUser(userId);
 
         if (isPasswordNotMatched(dto.getCurrentPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "기존 비밀번호가 일치하지 않습니다.");
+            throw new UserPasswordException();
         }
 
         if (!isPasswordNotMatched(dto.getNewPassword(), user.getPassword())) {
@@ -120,7 +123,7 @@ public class UserService {
         }
 
         if (isPasswordNotMatched(dto.getPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
+            throw new UserPasswordException();
         }
 
         userRepository.deleteById(userId);
@@ -132,7 +135,7 @@ public class UserService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 이메일이 존재하지 않습니다."));
 
         if (isPasswordNotMatched(dto.getPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+            throw new UserPasswordException();
         }
 
         return user.getId();
@@ -140,7 +143,7 @@ public class UserService {
 
     private User getUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     private boolean isPasswordNotMatched(String inputPassword, String encodedPassword) {
