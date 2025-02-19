@@ -7,9 +7,7 @@ import com.example.simplesns.domain.user.dto.response.UserProfileResponseDto;
 import com.example.simplesns.domain.user.dto.response.UserResponseDto;
 import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
-import com.example.simplesns.exception.custom.user.UserNotFoundException;
-import com.example.simplesns.exception.custom.user.UserPasswordException;
-import com.example.simplesns.exception.custom.user.UserSaveAlreadyExistException;
+import com.example.simplesns.exception.custom.user.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -106,7 +104,7 @@ public class UserService {
         }
 
         if (!isPasswordNotMatched(dto.getNewPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "새 비밀번호는 기존 비밀번호와 다르게 설정해야 합니다.");
+            throw new UserNewPasswordException();
         }
 
         String encodedPassword = passwordEncoder.encode(dto.getNewPassword());
@@ -119,7 +117,7 @@ public class UserService {
         User user = getUser(userId);
 
         if (!dto.getEmail().equals(user.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이메일이 일치하지 않습니다.");
+            throw new UserNotFoundEmailException();
         }
 
         if (isPasswordNotMatched(dto.getPassword(), user.getPassword())) {
