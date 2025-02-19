@@ -1,5 +1,6 @@
 package com.example.simplesns.domain.post.dto;
 
+import com.example.simplesns.domain.post.entity.Post;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,5 +26,15 @@ public class PostResponseDto {
         this.updatedAt = updatedAt;
         this.userId = userId;
         this.likeCount = likeCount;
+    }
+
+    public PostResponseDto(Post post) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.createdAt = post.getCreatedAt();
+        this.updatedAt = post.getUpdatedAt();
+        this.userId = post.getUser().getId();
+        this.likeCount = post.getLikeCount();
     }
 }

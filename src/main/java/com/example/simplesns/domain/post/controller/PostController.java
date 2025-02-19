@@ -19,15 +19,14 @@ public class PostController {
 
     // 게시글 조회 (페이징 처리) - findAll 메서드로 페이징 처리
     @GetMapping("/posts")
-    public ResponseEntity<PaginationResponse<PostResponseDto>> findAll(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size)
-    {
+    public ResponseEntity<PaginationResponse<PostResponseDto>> findAll(@RequestParam(defaultValue = "1") int page,
+                                                                       @RequestParam(defaultValue = "10") int size,
+                                                                       @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
 
-        Pageable pageable = PageRequest.of(page - 1, size); // 0-based index로 페이지 시작
+        Pageable pageable = PageRequest.of(page - 1, size);
 
         // Service에서 페이징 처리된 데이터를 받아옴
-        PaginationResponse<PostResponseDto> posts = postService.findAll(pageable);
+        PaginationResponse<PostResponseDto> posts = postService.findAll(pageable, userId);
 
         return ResponseEntity.ok(posts);
     }
@@ -42,8 +41,9 @@ public class PostController {
 
     // ID로 게시글 조회
     @GetMapping("/posts/{id}")
-    public ResponseEntity<PostResponseDto> findOne(@PathVariable Long id) {
-        PostResponseDto post = postService.findById(id);
+    public ResponseEntity<PostResponseDto> findOne(@PathVariable Long id,
+                                                   @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
+        PostResponseDto post = postService.findById(id, userId);
         return ResponseEntity.ok(post);
     }
 

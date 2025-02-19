@@ -61,7 +61,7 @@ public class CommentService {
 
         Set<Long> likedCommentIdList = userLikedList
                 .stream()
-                .map(liked -> liked.getComment().getId())
+                .map(commentLike -> commentLike.getComment().getId())
                 .collect(Collectors.toSet());
 
         List<CommentResponseDto> commentResponseDtoList = commentsPages.stream()
