@@ -1,8 +1,8 @@
 package com.example.simplesns.domain.post.service;
 
 import com.example.simplesns.common.dto.PaginationResponse;
-import com.example.simplesns.domain.post.dto.PostRequestDto;
-import com.example.simplesns.domain.post.dto.PostResponseDto;
+import com.example.simplesns.domain.post.dto.request.PostRequestDto;
+import com.example.simplesns.domain.post.dto.response.PostResponseDto;
 import com.example.simplesns.domain.post.entity.Post;
 import com.example.simplesns.domain.post.entity.PostLike;
 import com.example.simplesns.domain.post.repository.PostLikeRepository;

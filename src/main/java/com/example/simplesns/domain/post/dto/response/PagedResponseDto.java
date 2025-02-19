@@ -1,4 +1,4 @@
-package com.example.simplesns.domain.post.dto;
+package com.example.simplesns.domain.post.dto.response;
 
 import com.example.simplesns.domain.post.entity.Post;
 import lombok.Getter;
