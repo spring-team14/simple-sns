@@ -25,7 +25,7 @@ public class CommentLikeService {
 
     @Transactional
     public String toggleLike(Long commentId, Long userId) {
-        Optional<CommentLike> commentLike = commentLikeRepository.findByCommentIdAndUserId(commentId, userId);
+        Optional<CommentLike> commentLike = commentLikeRepository.findByUserIdAndCommentId(userId, commentId);
         
         if (commentLike.isPresent()) {
             commentLikeRepository.delete(commentLike.get());
