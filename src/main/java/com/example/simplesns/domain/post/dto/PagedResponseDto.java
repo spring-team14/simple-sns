@@ -28,7 +28,8 @@ public class PagedResponseDto {
                         post.getContent(),
                         post.getCreatedAt(),
                         post.getUpdatedAt(),
-                        post.getUser().getId()))
+                        post.getUser().getId(),
+                        post.getLikeCount()))
                 .collect(Collectors.toList());
         this.pageNumber = page.getNumber();
         this.pageSize = page.getSize();
