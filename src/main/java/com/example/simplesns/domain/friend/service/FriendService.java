@@ -16,11 +16,8 @@ import com.example.simplesns.domain.post.entity.Post;
 import com.example.simplesns.domain.user.entity.User;
 import com.example.simplesns.domain.user.repository.UserRepository;
 import com.example.simplesns.exception.custom.auth.UnauthorizedException;
+import com.example.simplesns.exception.custom.friend.*;
 import com.example.simplesns.exception.custom.user.UserNotFoundException;
-import com.example.simplesns.exception.custom.friend.FriendNotFoundException;
-import com.example.simplesns.exception.custom.friend.FriendRequestAlreadyExistException;
-import com.example.simplesns.exception.custom.friend.FriendRequestNotFoundException;
-import com.example.simplesns.exception.custom.friend.FriendStatusNotWaitException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +40,10 @@ public class FriendService {
 
     @Transactional
     public createFriendReqResponseDto createFriendReq(Long userId, createFriendReqRequestDto dto) {
+        // 본인을 친구 추가한 경우
+        if (userId.equals(dto.getFriendId())) {
+            throw new FriendRequestToSelfException(userId);
+        }
         User user = findUser(userId);
         User friend = findUser(dto.getFriendId());
         // 기존 요청 이력 확인
@@ -111,7 +113,7 @@ public class FriendService {
     public PaginationResponse<FriendResponseDto> findAll(int page, int size, Long userId, FriendRequestDto dto) {
         PageRequest pageable = createPageable(page, size);
         Page<Friend> friendsPage = friendRepository.findAllByUserId(pageable, userId, dto.getEmail(), dto.getName());
-        return new PaginationResponse<>(    friendsPage.map(FriendResponseDto::new));
+        return new PaginationResponse<>(friendsPage.map(FriendResponseDto::new));
     }
 
     @Transactional
@@ -138,7 +140,8 @@ public class FriendService {
     public PaginationResponse<FriendsPostResponseDto> findFriendsPosts(int page, int size, Long userId, FriendsPostRequestDto dto) {
         PageRequest pageable = createPageable(page, size);
         List<Long> friendIds = friendRepository.findFriendIdsByUserId(userId, dto.getFriendId());
-        Page<Post> friendsPostsPage = friendPostRepository.findAllByUserId(pageable, friendIds, dto.getFromAt(), dto.getToAt().plusDays(1));
+        LocalDate toAt = dto.getToAt() == null ? null : dto.getToAt().plusDays(1);
+        Page<Post> friendsPostsPage = friendPostRepository.findAllByUserId(pageable, friendIds, dto.getFromAt(), toAt);
         // TODO 댓글 수, 좋아요 수 추가
         return new PaginationResponse<>(friendsPostsPage.map(FriendsPostResponseDto::new));
     }
