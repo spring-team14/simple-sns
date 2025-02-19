@@ -126,6 +126,7 @@ public class PostService {
         }
 
         postRepository.deleteById(id);
+        postLikeRepository.deleteByPostId(id);
     }
 
     // PageRequest 생성 (페이징 처리에 필요한 메소드)
