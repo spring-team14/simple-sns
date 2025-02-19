@@ -18,4 +18,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 특정 게시글을 UserId로 찾는 예시 메소드 추가
     Optional<Post> findByUserId(Long userId);
+
 }
