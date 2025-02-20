@@ -54,8 +54,9 @@ public class PostService {
 
     // 게시글 조회 (페이징 처리) - Pageable 사용
     @Transactional(readOnly = true)
-    public PaginationResponse<PostResponseDto> findAll(Pageable pageable, Long userId) {
+    public PaginationResponse<PostResponseDto> findAll(int page, int size, Long userId) {
         // Post 게시글을 페이징하여 조회
+        PageRequest pageable = createPageable(page, size);
         Page<Post> postsPage = postRepository.findByDeletedAtIsNull(pageable);
 
         List<Long> postIdList = postsPage.getContent()
@@ -132,7 +133,7 @@ public class PostService {
     // PageRequest 생성 (페이징 처리에 필요한 메소드)
     private PageRequest createPageable(int page, int size) {
         int enablePage = (page > 0) ? page - 1 : 0;  // 페이지 번호는 0부터 시작하므로 1을 빼줍니다.
-        return PageRequest.of(enablePage, size, Sort.by("createdAt").descending());  // 최신 게시글부터 정렬
+        return PageRequest.of(enablePage, size, Sort.by("updatedAt").descending());  // 최신 게시글부터 정렬
     }
 
     private User findUser(Long userId) {
