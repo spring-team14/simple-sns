@@ -23,9 +23,6 @@ public class UserSaveRequestDto {
     private LocalDate birthdate;
 
     @NotBlank(message = "비밀번호는 필수 입력값입니다.")
-//    @Pattern(
-//            regexp = "^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?/~`]).{4,10}$",
-//            message = "비밀번호는 최소 4자 이상 10자 이내이며, 영문/숫자/특수문자를 포함해야 합니다."
-//    )
+    @Size(min = 5, max = 15, message = "비밀번호는 5자 이상 15자 이하로 입력해야 합니다.")
     private String password;
 }
