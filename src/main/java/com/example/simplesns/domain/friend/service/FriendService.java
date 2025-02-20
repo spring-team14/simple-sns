@@ -8,7 +8,7 @@ import com.example.simplesns.domain.friend.dto.response.ReqFriendResponseDto;
 import com.example.simplesns.domain.friend.dto.response.createFriendReqResponseDto;
 import com.example.simplesns.domain.friend.entity.Friend;
 import com.example.simplesns.domain.friend.entity.FriendRequest;
-import com.example.simplesns.domain.friend.entity.FriendStatus;
+import com.example.simplesns.domain.friend.util.FriendStatus;
 import com.example.simplesns.domain.friend.repository.FriendPostRepository;
 import com.example.simplesns.domain.friend.repository.FriendRepository;
 import com.example.simplesns.domain.friend.repository.FriendRequestRepository;
@@ -142,7 +142,6 @@ public class FriendService {
         List<Long> friendIds = friendRepository.findFriendIdsByUserId(userId, dto.getFriendId());
         LocalDate toAt = dto.getToAt() == null ? null : dto.getToAt().plusDays(1);
         Page<Post> friendsPostsPage = friendPostRepository.findAllByUserId(pageable, friendIds, dto.getFromAt(), toAt);
-        // TODO 댓글 수, 좋아요 수 추가
         return new PaginationResponse<>(friendsPostsPage.map(FriendsPostResponseDto::new));
     }
 
