@@ -1,4 +1,4 @@
-package com.example.simplesns.domain.friend.entity;
+package com.example.simplesns.domain.friend.util;
 
 import jakarta.persistence.AttributeConverter;
 

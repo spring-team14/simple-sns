@@ -1,6 +1,8 @@
 package com.example.simplesns.domain.friend.entity;
 
 import com.example.simplesns.common.entity.BaseEntity;
+import com.example.simplesns.domain.friend.util.FriendStatus;
+import com.example.simplesns.domain.friend.util.FriendStatusConverter;
 import com.example.simplesns.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
