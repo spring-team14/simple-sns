@@ -9,6 +9,8 @@ import com.example.simplesns.domain.user.dto.request.UserSaveRequestDto;
 import com.example.simplesns.domain.user.dto.response.UserProfileResponseDto;
 import com.example.simplesns.domain.user.dto.response.UserResponseDto;
 import com.example.simplesns.domain.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +64,12 @@ public class UserController {
     @DeleteMapping("/users")
     public void delete(
             @SessionAttribute(name = Const.LOGIN_USER) Long userId,
-            @Valid @RequestBody UserDeleteRequestDto dto) {
+            @Valid @RequestBody UserDeleteRequestDto dto,
+            HttpServletRequest request) {
         userService.delete(userId, dto);
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
     }
 }
