@@ -27,6 +27,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     private int likeCount = 0;
+    private int commentCount = 0;
 
     public Post(String title, String content, User user) {
         this.title = title;
@@ -46,4 +47,8 @@ public class Post extends BaseEntity {
     public void decreaseLikeCount() {
         this.likeCount --;
     }
+
+    public void increaseCommentCount() { this.commentCount ++; }
+
+    public void decreaseCommentCount() { this.commentCount --; }
 }

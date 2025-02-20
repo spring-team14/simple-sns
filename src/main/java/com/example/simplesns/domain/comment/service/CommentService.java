@@ -43,6 +43,7 @@ public class CommentService {
         Post post = findPost(postId);
         User user = findUser(userId);
         Comment comment = commentRepository.save(new Comment(post, user, dto.getContent()));
+        post.increaseCommentCount();
         return new CommentResponseDto(comment);
     }
 
@@ -102,6 +103,7 @@ public class CommentService {
         if (!comment.getUser().getId().equals(userId)) {
             throw new UnauthorizedException();
         }
+        comment.getPost().decreaseCommentCount();
         commentRepository.deleteById(commentId);
         commentLikeRepository.deleteByCommentId(commentId);
     }
