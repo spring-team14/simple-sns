@@ -24,10 +24,8 @@ public class PostController {
                                                                        @RequestParam(defaultValue = "10") int size,
                                                                        @SessionAttribute(name = Const.LOGIN_USER) Long userId) {
 
-        Pageable pageable = PageRequest.of(page - 1, size);
-
         // Service에서 페이징 처리된 데이터를 받아옴
-        PaginationResponse<PostResponseDto> posts = postService.findAll(pageable, userId);
+        PaginationResponse<PostResponseDto> posts = postService.findAll(page, size, userId);
 
         return ResponseEntity.ok(posts);
     }
